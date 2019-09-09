@@ -1,0 +1,74 @@
+xdel(winsid());//fechar janelas de figuras
+clear();//limpar memória
+clc();//limpar console
+t = 0.:0.01:5;
+t = t';
+
+function s=f(u)
+    noisegen(0.01, 5, 0.1);
+    x = 0:0.01:5;
+    noise = feval(x, Noise);
+    Sn = 1.11*u.^0 + 0.45*u + 0.11*u.^2 + noise';
+    S = 1.11*u.^0 + 0.45*u + 0.11*u.^2;
+    s = [Sn, S];
+endfunction
+
+u = sin(t)
+s = f(u)
+Sn = s(:,1)
+S = s(:,2)
+PHI = [u.^0 u.^1 u.^2 u.^3 u.^4] ;
+theta31n = inv(PHI(:,1:4)'*PHI(:,1:4))*PHI(:,1:4)'*Sn;
+V11n = 0.5*sum((Sn - (PHI(:,1:4)*theta31n)).^2)
+theta41n = inv(PHI'*PHI)*PHI'*Sn;
+V21n = 0.5*sum((Sn - (PHI*theta41n)).^2)
+figure(0)
+plot2d(t, PHI(:,1:4)*theta31n, 4)
+plot2d(t, PHI*theta41n, 5)
+plot2d(t, Sn, 6)
+
+/////////////////////////////////////////////
+
+PHI = [u.^0 u.^1 u.^2 u.^3 u.^4] ;
+theta31 = inv(PHI(:,1:4)'*PHI(:,1:4))*PHI(:,1:4)'*S;
+V11 = 0.5*sum((S - (PHI(:,1:4)*theta31)).^2)
+theta41 = inv(PHI'*PHI)*PHI'*S;
+V21 = 0.5*sum((S - (PHI*theta41)).^2)
+figure(1)
+plot2d(t, PHI(:,1:4)*theta31, 4)
+plot2d(t, PHI*theta41, 5)
+plot2d(t, S, 6)
+
+/////////////////////////////////////////////
+
+
+u = t.^2
+s = f(u)
+Sn = s(:,1)
+S = s(:,2)
+
+PHI = [u.^0 u.^1 u.^2 u.^3 u.^4];
+
+theta32n = inv(PHI(:,1:4)'*PHI(:,1:4))*PHI(:,1:4)'*Sn;
+V12n = 0.5*sum((Sn - (PHI(:,1:4)*theta31n)).^2)
+theta42n = inv(PHI'*PHI)*PHI'*Sn;
+V22n = 0.5*sum((Sn - (PHI*theta41n)).^2)
+
+figure(2)
+plot2d(t, PHI(:,1:4)*theta31n, 4)
+plot2d(t, PHI*theta41n, 5)
+plot2d(t, Sn, 6)
+
+/////////////////////////////////////////////
+PHI = [u.^0 u.^1 u.^2 u.^3 u.^4] ;
+theta31 = inv(PHI(:,1:4)'*PHI(:,1:4))*PHI(:,1:4)'*S;
+V12 = 0.5*sum((S - (PHI(:,1:4)*theta31)).^2)
+theta42 = inv(PHI'*PHI)*PHI'*S;
+V22 = 0.5*sum((S - (PHI*theta41)).^2)
+
+figure(3)
+plot2d(t, PHI(:,1:4)*theta31, 4)
+plot2d(t, PHI*theta41, 5)
+plot2d(t, S, 6)
+
+/////////////////////////////////////////////
