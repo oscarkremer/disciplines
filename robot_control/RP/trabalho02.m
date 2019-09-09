@@ -21,10 +21,10 @@ y = 1*ones(sizes(1),1);
 x = 1*sin(5*t);
 r_d = (x.^2 + y.^2).^0.5;
 theta_d = atan2(y, x);
-r_dotd = diff(r_d);
-theta_dotd = diff(theta_d);
-r_dot2d = diff(r_dotd);
-theta_dot2d = diff(theta_dotd);
+r_dotd = 0.002*diff(r_d);
+theta_dotd = 0.002*diff(theta_d);
+r_dot2d = 0.002*diff(r_dotd);
+theta_dot2d = 0.002*diff(theta_dotd);
 
 q_des = [theta_d r_d]';
 q_dot_des = [theta_dotd r_dotd]';
