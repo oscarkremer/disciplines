@@ -1,51 +1,97 @@
-clear 
-
-function x=mvg(mean,cov)
-  %%%this is the xy plane limits
-  [x y]=meshgrid(-4:0.1:4,-4:0.1:4);
-  x1=[x(:) y(:)]';
-  %%%multivar Gassiaan
-  mn=repmat(mean,1,size(x1,2));
-  mulGau= 1/(2*pi*det(cov)^(1/2))*exp(-0.5.*(x1-mn)'*inv(cov)*(x1-mn));
-  G=reshape(diag(mulGau),81,81);
-  figure(1);
-  mesh(-4:0.1:4, -4:0.1:4, G);
-  figure(2);
-  contour(-4:0.1:4, -4:0.1:4, G);
-  %plot3(x1(1,:),x1(2,:),diag(mulGau))
-endfunction
-
+%%%Clear console, variables and close all windows%%%
+clc;
+clear ;
+close all;
+%%%Load data and separate classes%%%
 data= load('formantdata.mat');
-x = data.D;
-y = data.L;
-x0 = [];
+x0 = data.D;
+y0 = data.L;
 x1 = [];
+x2 = [];
 for i=1:449
-  if y(i)==0
-    x0 = [x0; x(i,:)];
+  if y0(i)==0
+    x1 = [x1; x0(i,:)];
   else
-    x1 = [x1; x(i,:)];
+    x2 = [x2; x0(i,:)];
+  end
+end
+%%%Calculate size of each class, mean and covariance matrix%%%
+
+size1 = size(x1);
+size1 = size1(1);
+mu1 = mean(x1);
+
+size2 = size(x2);
+size2 = size2(1);
+mu2 = mean(x2);
+
+cov1 = zeros(2,2);
+cov2 = zeros(2,2);
+for i=1:size1
+  cov1(1,1)= cov1(1,1) + (x1(i,1) - mu1(1))^2;
+  cov1(1,2)= cov1(1,2) + (x1(i,1) - mu1(1))*(x1(i,2) - mu1(2));
+  cov1(2,1)= cov1(2,1) + (x1(i,2) - mu1(2))*(x1(i,1) - mu1(1));
+  cov1(2,2)= cov1(2,2) + (x1(i,2) - mu1(2))^2;
+end
+
+for i=1:size2
+  cov2(1,1)+= (x2(i,1) - mu2(1))^2;
+  cov2(1,2)+= (x2(i,1) - mu2(1))*(x2(i,2) - mu2(2));
+  cov2(2,1)+= (x2(i,2) - mu2(2))*(x2(i,1) - mu2(1));
+  cov2(2,2)+= (x2(i,2) - mu2(2))^2;
+end
+
+cov1 = (1/size1)*cov1;
+cov2 = (1/size2)*cov2;
+cov_t = cov1+cov2
+
+%%% 3-D Plot of distributions and its contours %%%
+
+x = mvg(mu1', mu2', cov_t);
+phi = size2/(size1+size2);
+predict_1 = [];
+predict_2 = [];
+
+%%% Predict each class from the gaussian distributions generated %%%
+
+for i=1:449
+  if pdf(x0(i,:), mu1, cov_t) > pdf(x0(i,:),mu2,cov_t);
+     predict_1 = [predict_1; x0(i,:)];
+  else
+     predict_2 = [predict_2; x0(i,:)];
   end
 end
 
-mu0 = mean(x0);
-mu1 = mean(x1);
-cov = zeros(2,2);
-sum11 = 0;
-sum12 = 0;
-sum21 = 0;
-sum22 = 0;
+%%% Plots of predictions %%%
 
-for i=1:262
-  sum11 = sum11 + (x0(i,:) - mu0)'*(x0(i,:) - mu0);
-end
-for i=1:187
-  sum12 = sum22 + (x1(i,:) - mu1)'*(x0(i,:) - mu0);
-  sum21 = sum22 + (x0(i,:) - mu0)'*(x1(i,:) - mu1);
-  sum22 = sum22 + (x1(i,:) - mu1)'*(x1(i,:) - mu1);
-end
-cov = sum11+sum12+sum21+sum22;
-cov = (1/449)*cov;
-x = mvg(mu0', cov);
-x = mvg(mu1', cov);
-phi = 187/449;
+
+figure(3)
+clf;
+scatter (predict_1(:,1), predict_1(:,2), "r");
+hold on;
+scatter (predict_2(:,1), predict_2(:,2), "b");
+hold on;
+mu0 = 0.5*(mu1+mu2);
+sigma1 = std(x0(:,1));
+sigma2 = std(x0(:,2));
+orientation = [(1/sigma2^2)*(mu1(2)-mu2(2)); -(1/sigma1^2)*(mu1(1)-mu2(1))]
+t = linspace(-2,3,100);
+bound = mu0(2) + orientation(2)*(t-mu0(1))/orientation(1);
+plot(t,bound)
+hold off;
+legend ("Classe 1"," Classe 2 ", "Boundary");
+grid on;
+title ("Predictions - Plot");
+
+%%% Plots of Right Results %%%
+
+figure(4)
+clf;
+scatter (x1(:,1), x1(:,2), "g");
+hold on;
+scatter (x2(:,1), x2(:,2), "black");
+hold off;
+grid on;
+legend ("Classe 1"," Classe 2 ");
+title ("Original Dataset Classification- Plot");
+
