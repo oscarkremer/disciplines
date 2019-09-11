@@ -43,7 +43,7 @@ end
 
 cov1 = (1/size1)*cov1;
 cov2 = (1/size2)*cov2;
-cov_t = cov1+cov2
+cov_t = cov1+cov2;
 
 %%% 3-D Plot of distributions and its contours %%%
 
@@ -55,7 +55,7 @@ predict_2 = [];
 %%% Predict each class from the gaussian distributions generated %%%
 
 for i=1:449
-  if pdf(x0(i,:), mu1, cov_t) > pdf(x0(i,:),mu2,cov_t);
+  if pdf(x0(i,:), mu1, cov_t) > pdf(x0(i,:), mu2,cov_t);
      predict_1 = [predict_1; x0(i,:)];
   else
      predict_2 = [predict_2; x0(i,:)];
@@ -72,12 +72,12 @@ hold on;
 scatter (predict_2(:,1), predict_2(:,2), "b");
 hold on;
 mu0 = 0.5*(mu1+mu2);
-sigma1 = std(x0(:,1));
-sigma2 = std(x0(:,2));
-orientation = [(1/sigma2^2)*(mu1(2)-mu2(2)); -(1/sigma1^2)*(mu1(1)-mu2(1))]
+sigma1 = std(x0(:,1), 1);
+sigma2 = std(x0(:,2), 1);
+orientation = [(1/sigma2^2)*(mu1(2)-mu2(2)); (1/sigma1^2)*(mu1(1)-mu2(1))];
 t = linspace(-2,3,100);
-bound = mu0(2) + orientation(2)*(t-mu0(1))/orientation(1);
-plot(t,bound)
+bound = mu0(2) - orientation(2)*(t-mu0(1))/orientation(1);
+plot(t,bound);
 hold off;
 legend ("Classe 1"," Classe 2 ", "Boundary");
 grid on;

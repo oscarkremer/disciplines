@@ -7,12 +7,12 @@ function x=mvg(mean1, mean2, cov)
   mulGau2= 1/(2*pi*det(cov)^(1/2))*exp(-0.5.*(x1-mn)'*inv(cov)*(x1-mn));
   G1=reshape(diag(mulGau1),81,81);
   G2=reshape(diag(mulGau2),81,81);
-  size(G1)
   figure(1);
   clf;
   mesh(-4:0.1:4, -4:0.1:4, G1);
   hold on;
   mesh(-4:0.1:4, -4:0.1:4, G2);
+  legend('Classe 1 - y=0', 'Classe 2 -y=1');
   hold off;
   figure(2);
   clf;
