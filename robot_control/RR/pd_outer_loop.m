@@ -38,7 +38,7 @@ q_dot2_des = [theta1_dot2d theta2_dot2d]';
 
 q0 = [0.1; 0];
 q_dot0 = [0; 0];
-gain_p = 100;
+gain_p = 10000;
 gain_v = 2*gain_p^0.5;
 k_p = [gain_p; gain_p];
 k_v = [gain_v; gain_v];

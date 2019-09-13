@@ -2,13 +2,13 @@
 clc;
 clear; 
 close all;
-%% Definir massas e comprimentos dos braços do Robô RR
+%% Definir massas e comprimentos dos braï¿½os do Robï¿½ RR
 
 m1 = 1; 
 m2 = 1; 
 L1 = 1;
 L2 = 1;
-%% Definir passo e tempo final da simulação e pegar informações de tamanho dos vetores gerados
+%% Definir passo e tempo final da simulaï¿½ï¿½o e pegar informaï¿½ï¿½es de tamanho dos vetores gerados
 
 delta_time = 0.002;
 final_time = 5;
@@ -18,7 +18,10 @@ t_plot = 0:delta_time:(final_time-2*delta_time);
 t_plot = t_plot';
 sizes = size(t);
 
-%% Geração da trajetoria real para calcular os parâmetros desejados
+%% Geraï¿½ï¿½o da trajetoria real para calcular os parï¿½metros desejados
+%x = 0.3*cos(0.1*t) + 0.2*ones(sizes(1),1);
+%y = 0.3*sin(5*t) + 0.4*ones(sizes(1),1);
+
 
 y = 0.3*sin(5*t) + 0.4*ones(sizes(1),1);
 x = 0.3*cos(5*t) + 0.2*ones(sizes(1),1);
@@ -28,7 +31,7 @@ sin_theta2 = (1-cos_theta2.^2).^0.5;
 theta2_d = atan2(sin_theta2, cos_theta2);
 theta1_d = atan2(y, x) - atan2(L2*sin(theta2_d), L1*ones(sizes(1),1) + L2*cos(theta2_d));
 
-%% Calcular a partir dos parâmetros desejados os valores de suas derivadas de primeira e segunda ordem
+%% Calcular a partir dos parï¿½metros desejados os valores de suas derivadas de primeira e segunda ordem
 
 
 theta1_dotd = (1/delta_time)*diff(theta1_d);
@@ -40,7 +43,7 @@ q_des = [theta1_d theta2_d]';
 q_dot_des = [theta1_dotd theta2_dotd]';
 q_dot2_des = [theta1_dot2d theta2_dot2d]';
 
-%% Definir condições iniciais e ganhos do controlador
+%% Definir condiï¿½ï¿½es iniciais e ganhos do controlador
 
 q0 = [0.1; 0];
 q_dot0 = [0; 0];
@@ -48,27 +51,27 @@ gain_p = 100;
 gain_v = 2*gain_p^0.5;
 k_p = [gain_p; gain_p];
 k_v = [gain_v; gain_v];
-k_i = [100;100];
+k_i = [2500;2500];
 g = 9.8;
 q_plot = zeros(sizes(1)-2,2);
 computed_torque1 = zeros(sizes(1)-2,2);
 computed_torque2 = zeros(sizes(1)-2,2);
 
+perturb = 5;
 error_old = (q_des(:,1) - q0);
 error_plot = zeros(sizes(1)-2,2);
-%% Laço Principal para Simulação
-
+%% Laï¿½o Principal para Simulaï¿½ï¿½o
 
 for i=1:sizes(1)-2
     error_new = (q_des(:,i) - q0);
-    int_error = error_old + (error_new - error_old)*0.002;
+    int_error = error_old + (error_old)*delta_time;
     M = [(m1+m2)*L1^2+m2*L2^2+2*m2*L1*L2*cos(q0(2)) m2*L2^2+m2*L1*L2*cos(q0(2)); 
          m2*L2^2 + m2*L1*L2*cos(q0(2)) m2*L2^2]; 
     V = [-m2*L1*L2*(2*q_dot0(1)*q_dot0(2)+q_dot0(2)^2)*sin(q0(2));
           m2*L1*L2*q_dot0(1)^2*sin(q0(2))];
     G = [(m1+m2)*g*L1*cos(q0(1))+m2*g*L2*cos(q0(1)+q0(2)); m2*g*L2*cos(q0(1)+q0(2))];   
-    tau = M*(q_dot2_des(:,i) + k_v.*(q_dot_des(:,i)-q_dot0) + k_p.*(q_des(:,i) - q0)) + V +G;
-    q_dot2 = q_dot2_des(:,i) + k_v.*(q_dot_des(:,i)-q_dot0) + k_p.*error_new + k_i.*int_error;
+    tau = M*(q_dot2_des(:,i) + k_v.*(q_dot_des(:,i)-q_dot0) + k_p.*(q_des(:,i) - q0)) + k_i.*int_error + V +G;
+    q_dot2 = q_dot2_des(:,i) + k_v.*(q_dot_des(:,i)-q_dot0) + k_p.*error_new + k_i.*int_error - perturb*inv(M)*[1;1];
     q_dot = q_dot0+ delta_time*q_dot2;
     q = q0 + delta_time*q_dot + 0.5*(q_dot2)*(delta_time)^2;
     error_old = error_new;
@@ -80,7 +83,7 @@ for i=1:sizes(1)-2
     q_plot(i,:) = q;
 end
 
-%% Plots para visualização dos ângulos, posição, torque e erros
+%% Plots para visualizaï¿½ï¿½o dos ï¿½ngulos, posiï¿½ï¿½o, torque e erros
 
 figure(3)
 subplot(2,1,1);
@@ -130,7 +133,7 @@ subplot(2,1,2);
 plot(t_plot, error_plot(:,2));
 title('Error - Joint 2')
 
-%% Rotina para animação do robô
+%% Rotina para animaï¿½ï¿½o do robï¿½
 
 trajectory_x = [];
 trajectory_y = [];
