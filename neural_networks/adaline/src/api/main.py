@@ -41,7 +41,11 @@ class Perceptron:
             epochs+=1
         
         plt.plot(error_plot)
-        plt.show()
+        plt.title('Mean Squared Error')
+        plt.grid(True)
+        plt.xlabel('Epochs')
+        plt.ylabel('MSE')
+        plt.savefig('plot.png')
         self.weights = weights
         self.epochs = epochs
 
