@@ -4,13 +4,11 @@ import numpy as np
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 
-
-class Perceptron:
+class Adaline:
     def __init__(self, learning_rate, sensibility=0.000001):
         self.learning_rate = learning_rate
         self.sensibility = sensibility
-        
-        
+         
     def train(self, trainX, trainY):
         epochs = 1
         weights = np.random.rand(trainX.shape[1]+ 1)
@@ -21,33 +19,24 @@ class Perceptron:
         error_plot = []
         counter =1 
         while(True):
-            for i in range(trainY.shape[0]):
-                predictions[i] = weights.dot(np.transpose(trainX))[i]
-            old_error = np.sum(np.power(predictions-trainY, 2))/(predictions.shape[0])
-
-            for i in range(trainY.shape[0]):
-            
+            old_error = self.error_mse(trainX, trainY, weights)
+            for i in range(trainY.shape[0]):            
                 predictions[i] = weights.dot(np.transpose(trainX))[i]
                 weights+=self.learning_rate*(trainY[i] - predictions[i])*trainX[i]
-
-            for i in range(trainY.shape[0]):
-                predictions[i] = weights.dot(np.transpose(trainX))[i]
-            new_error = np.sum(np.power(predictions-trainY, 2))/(predictions.shape[0])
-            
+            new_error = self.error_mse(trainX, trainY, weights)
             if  abs(old_error - new_error) <= self.sensibility:
                 break
             error_plot.append(old_error)
-
             epochs+=1
-        
-        plt.plot(error_plot)
-        plt.title('Mean Squared Error')
-        plt.grid(True)
-        plt.xlabel('Epochs')
-        plt.ylabel('MSE')
-        plt.savefig('plot.png')
         self.weights = weights
         self.epochs = epochs
+        return error_plot
+
+    def error_mse(self, trainX, trainY, weights):
+        predictions = np.zeros(trainY.shape[0])
+        for i in range(trainY.shape[0]):
+            predictions[i] = weights.dot(np.transpose(trainX))[i]
+        return np.sum(np.power(predictions-trainY, 2))/(predictions.shape[0])
 
     def predict(self, data):
         return self.activation(self.weights.dot(np.transpose(np.concatenate([[-1], data]))))
@@ -57,28 +46,39 @@ class Perceptron:
 
 
 if __name__=='__main__':
-    data = pd.read_csv('data/raw/data.csv', decimal=',')
+    data = pd.read_csv('data.csv', decimal=',')
     train = data[:int(0.7*len(data))]
     test = data[int(0.7*len(data)):]
     trainX = np.array(train.drop(columns='d').values)
     trainY = np.array(train['d'].values)
     testX = np.array(test.drop(columns='d').values)    
     testY = np.array(test['d'].values)
-    model = Perceptron(learning_rate=0.0025)
-    model.train(trainX, trainY)
-    print('Pesos para após treinamento:')
-    print(model.weights)
-    print('Número total de épocas encontrado:')
-    print(model.epochs)
-    predictions = []
-    for data in testX:
-        predictions.append(model.predict(np.array(data)))
-    confusion = confusion_matrix(testY, predictions)
-    print('Matriz de Confusao')
-    print(confusion)
-    validation = pd.read_csv('data/processed/validation.csv').values
-    for value in validation:
-        print('valores da amostra')
-        print(value)
-        print('predicao')
-        print(model.predict(np.array(value)))
+    number_test = 5
+    errors = []
+    for i in range(number_test):
+        model = Adaline(learning_rate=0.0025)
+        errors.append(model.train(trainX, trainY))
+        print('Pesos para após treinamento:')
+        print(model.weights)
+        print('Número total de épocas encontrado: {}'.format(model.epochs))
+        predictions = []
+        for data in testX:
+            predictions.append(model.predict(np.array(data)))
+        confusion = confusion_matrix(testY, predictions)
+        print('Matriz de Confusao')
+        print(confusion)
+        validation = pd.read_csv('validation.csv').values
+        for value in validation:
+            print('--- Valores da Amostra')
+            print(value)
+            print('--- Predicao')
+            print(model.predict(np.array(value)))
+    
+    for i in range(number_test):
+       plt.plot(errors[i])
+    plt.title('Mean Squared Error')
+    plt.grid(True)
+    plt.xlabel('Epochs')
+    plt.ylabel('MSE')
+    plt.savefig('plot.png')
+    
