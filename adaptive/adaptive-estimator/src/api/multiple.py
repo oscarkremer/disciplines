@@ -2,19 +2,30 @@ import os
 import numpy as np 
 import matplotlib.pyplot as plt 
 from src.models import Estimator
+from random import *
 
 def f(t):
-    return np.random.uniform(low=0, high=4, size=t.shape[0])
+    print(random())
+    print(t.shape[0])
+    sig = []
+    for i in range(t.shape[0]):
+        if random() > 0.5:
+            for j in range(100):
+                sig.append(1)
+        else:
+            for j in range(100):
+                sig.append(0)
+    print(sig[:t.shape[0]])
+    return np.array(sig[:t.shape[0]])
 
 if __name__=='__main__':
     u, y ,models, thetas, p = [], [], [], [], []
     step = 0.001
-    final_time = 0.500
+    final_time = 5.0
     t = np.arange(0, step + final_time, step)
-    update_times = [0.51]
-    a = 0.4
-    b1 = 2
-    b2 = 1.5
+    update_times = [5.1]
+    a = -0.997439
+    b1 = 0.00256081
     
 #   a = 0.4
   #   update_times = [0.03, 0.05, 0.07]
@@ -28,11 +39,11 @@ if __name__=='__main__':
 
     for i in range(t.shape[0]):
         if i == 0:
-            y.append(b2*np.sin(sig[i]))
-            u.append([0, 0, 0])
+            y.append(0)
+            u.append([0, 0])
         else:
-            y.append(-a*y[i-1] + b1*sig[i-1] + b2*np.sin(sig[i]))        
-            u.append([-y[i-1], sig[i-1], np.sin(sig[i])])
+            y.append(-a*y[i-1] + b1*sig[i-1])        
+            u.append([y[i-1], sig[i-1]])
     u = np.transpose(np.array(u))
     print(u.shape)
 #    print(size(y))
@@ -71,7 +82,7 @@ if __name__=='__main__':
     y_hat  = np.zeros(t.shape[0])
     error = np.zeros(t.shape[0])
     for i in range(t.shape[0]):
-        y_hat[i] = thetas[i][0]*u[0][i] + thetas[i][1]*u[1][i] + thetas[i][2]*u[2][i]
+        y_hat[i] = thetas[i][0]*u[0][i] + thetas[i][1]*u[1][i]
         error[i] = (y[i] - y_hat[i])/y[i]
 
     plt.plot(t, y)
@@ -85,7 +96,6 @@ if __name__=='__main__':
     for model in models:
         plt.plot(t, np.transpose(np.array(model.theta_plot))[0])
         plt.plot(t, np.transpose(np.array(model.theta_plot))[1])
-        plt.plot(t, np.transpose(np.array(model.theta_plot))[2])
         plt.show()
 
     plt.plot(t, error)
