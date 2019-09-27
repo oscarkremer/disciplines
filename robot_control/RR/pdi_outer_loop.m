@@ -106,11 +106,8 @@ title('Computed Force')
 
 
 x_real1  = L1*cos(q_plot(:,1));
-
 y_real1  = L1*sin(q_plot(:,1));
-
 x_real2  = L1*cos(q_plot(:,1)) + L2*cos(q_plot(:,1)+q_plot(:,2));
-
 y_real2  = L1*sin(q_plot(:,1)) + L2*sin(q_plot(:,1)+q_plot(:,2));
 
 

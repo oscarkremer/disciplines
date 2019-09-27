@@ -66,7 +66,7 @@ for i=1:sizes(1)-2
     V = [-m2*L1*L2*(2*q_dot0(1)*q_dot0(2)+q_dot0(2)^2)*sin(q0(2));
           m2*L1*L2*q_dot0(1)^2*sin(q0(2))];
     G = [(m1+m2)*g*L1*cos(q0(1))+m2*g*L2*cos(q0(1)+q0(2)); m2*g*L2*cos(q0(1)+q0(2))];   
-    tau = k_v.*(q_dot_des(:,i)-q_dot0) + k_p.*(q_des(:,i) - q0) + G;
+    tau = k_v.*(q_dot_des(:,i)-q_dot0) + k_p.*(q_des(:,i) - q0) + G_hat;
     q_dot2 = inv(M)*(tau-V-G -[perturb;perturb]);
     q_dot = q_dot0+ delta_time*q_dot2;
     q = q0 + delta_time*q_dot + 0.5*(q_dot2)*(delta_time)^2;
