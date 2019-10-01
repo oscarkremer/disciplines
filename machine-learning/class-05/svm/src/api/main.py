@@ -2,7 +2,39 @@ import scipy.io
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from matplotlib import pyplot as plt
-from src.models import SVM
+
+class SVM:
+  
+    def __init__(self, X, y, C, kernel, alphas, b, errors):
+        self.X = X               
+        self.y = y               
+        self.C = C               
+        self.kernel = kernel     
+        self.alphas = alphas     
+        self.b = b               
+        self.errors = errors     
+        self._obj = []           
+        self.m = len(self.X)     
+
+def menu():
+    print('[1] - Kernel Polinomial de Grau 1 \n')
+    print('[2] - Kernel Polinomial de Grau 2 \n')
+    print('[3] - Kernel Polinomial de Grau 3 \n')
+    print('[Outros] - Kernel Gaussiano \n')
+    kernel = input('Entre com sua escolha: ')
+    try:
+        if int(kernel) == 1:
+            return 'Linear'
+        else:
+            if int(kernel) == 2:
+                return 'Quadratic'
+            else:
+                if int(kernel) == 3:
+                    return 'Cubic'
+                else:
+                    return 'Gaussian'
+    except:
+        return 'Gaussian'
 
 def linear_kernel(x, y):
     return x @ y.T
@@ -196,7 +228,7 @@ if __name__=='__main__':
     eps = 0.01
     m = len(X_train_scaled)
     initial_alphas = np.zeros(m)
-    type_kernel = 'Quadratic'
+    type_kernel = menu()
     if type_kernel=='Linear':
         model = SVM(X_train_scaled, y, C, linear_kernel,
                     initial_alphas, initial_b, np.zeros(m))
