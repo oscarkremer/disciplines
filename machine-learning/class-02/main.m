@@ -1,4 +1,4 @@
-fdata = load_data();
+data = load_data();
 X = data(:,1:2);
 y = data(:,3);
 
