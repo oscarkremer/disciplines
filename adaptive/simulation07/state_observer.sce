@@ -2,16 +2,16 @@ xdel(winsid());//fechar janelas de figuras
 clear();//limpar memória
 clc();//limpar console
 t0 = 0;
-delta_t = 0.01;
+delta_t = 0.001;
 final_time = 40;
 t = (0:delta_t:final_time);
 t = t'
 ifinal=size(t);ifinal=ifinal(1);
 
 F = 10*ones(ifinal, 1);
-m = 40;
-b = 10;
-k = 100;
+m = 1;
+b = 40;
+k = 400;
 s = poly(0, 's');
 g = syslin('c', 1/m/(s^2 +b*s/m+ k/m))
 y = csim(F', t', g)';
