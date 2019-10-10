@@ -47,11 +47,11 @@ q_dot2_des = [theta1_dot2d theta2_dot2d]';
 
 q0 = [0.1; 0];
 q_dot0 = [0; 0];
-gain_p = 100;
+gain_p = 2500;
 gain_v = 2*gain_p^0.5;
 k_p = [gain_p; gain_p];
 k_v = [gain_v; gain_v];
-k_i = [2500;2500];
+k_i = [1000;1000];
 g = 9.8;
 q_plot = zeros(sizes(1)-2,2);
 computed_torque1 = zeros(sizes(1)-2,2);
@@ -60,18 +60,19 @@ computed_torque2 = zeros(sizes(1)-2,2);
 perturb = 5;
 error_old = (q_des(:,1) - q0);
 error_plot = zeros(sizes(1)-2,2);
+int_error = [0;0];
 %% La�o Principal para Simula��o
 
 for i=1:sizes(1)-2
     error_new = (q_des(:,i) - q0);
-    int_error = error_old + (error_old)*delta_time;
     M = [(m1+m2)*L1^2+m2*L2^2+2*m2*L1*L2*cos(q0(2)) m2*L2^2+m2*L1*L2*cos(q0(2)); 
          m2*L2^2 + m2*L1*L2*cos(q0(2)) m2*L2^2]; 
     V = [-m2*L1*L2*(2*q_dot0(1)*q_dot0(2)+q_dot0(2)^2)*sin(q0(2));
           m2*L1*L2*q_dot0(1)^2*sin(q0(2))];
     G = [(m1+m2)*g*L1*cos(q0(1))+m2*g*L2*cos(q0(1)+q0(2)); m2*g*L2*cos(q0(1)+q0(2))];   
-    tau = M*(q_dot2_des(:,i) + k_v.*(q_dot_des(:,i)-q_dot0) + k_p.*(q_des(:,i) - q0)) + k_i.*int_error + V +G;
-    q_dot2 = q_dot2_des(:,i) + k_v.*(q_dot_des(:,i)-q_dot0) + k_p.*error_new + k_i.*int_error - perturb*inv(M)*[1;1];
+    tau = M*(q_dot2_des(:,i)+k_v.*(q_dot_des(:,i)-q_dot0)+k_p.*(q_des(:,i)-q0)+k_i.*int_error)+V+G;
+    q_dot2 = inv(M)*(tau-V-G);
+    int_error = int_error + (q_des(:, i)-q0)*delta_time;
     q_dot = q_dot0+ delta_time*q_dot2;
     q = q0 + delta_time*q_dot + 0.5*(q_dot2)*(delta_time)^2;
     error_old = error_new;
