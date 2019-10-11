@@ -27,14 +27,6 @@ theta2_d = 0.1*cos(2*pi*t/2);
 x = L1*cos(theta1_d) + L2*cos(theta1_d+theta2_d);
 y = L1*sin(theta1_d) + L2*sin(theta1_d+theta2_d);
 
-%cos_theta2 = (x.^2 + y.^2 - L1^2*ones(sizes(1),1) - L2^2*ones(sizes(1),1))/(2*L1*L2);
-%sin_theta2 = (1-cos_theta2.^2).^0.5;
-%theta2_d = atan2(sin_theta2, cos_theta2);
-%theta1_d = atan2(y, x) - atan2(L2*sin(theta2_d), L1*ones(sizes(1),1) + L2*cos(theta2_d));
-
-%% Calcular a partir dos par�metros desejados os valores de suas derivadas de primeira e segunda ordem
-
-
 theta1_dotd = (1/delta_time)*diff(theta1_d);
 theta2_dotd = (1/delta_time)*diff(theta2_d);
 theta1_dot2d = (1/delta_time)*diff(theta1_dotd);
@@ -44,7 +36,6 @@ q_des = [theta1_d theta2_d]';
 q_dot_des = [theta1_dotd theta2_dotd]';
 q_dot2_des = [theta1_dot2d theta2_dot2d]';
 
-%% Definir condi��es iniciais e ganhos do controlador
 q0_gravity = [0.1; 0];
 q0 = [0.1; 0];
 q_dot0 = [0; 0];
@@ -67,7 +58,7 @@ error_plot_gravity = zeros(sizes(1)-2,2);
 
 for i=1:sizes(1)-2
     error_new = (q_des(:,i) - q0_gravity);
-    M = [(m1+m2)*L1^2+m2*L2^2+2*m2*L1*L2*cos(q0(2)) m2*L2^2+m2*L1*L2*cos(q0(2)); 
+    M = [(m1+m2)/*L1^2+m2*L2^2+2*m2*L1*L2*cos(q0(2)) m2*L2^2+m2*L1*L2*cos(q0(2)); 
          m2*L2^2 + m2*L1*L2*cos(q0(2)) m2*L2^2]; 
     V = [-m2*L1*L2*(2*q_dot0(1)*q_dot0(2)+q_dot0(2)^2)*sin(q0(2));
           m2*L1*L2*q_dot0(1)^2*sin(q0(2))];
@@ -136,7 +127,7 @@ plot(t_plot, computed_torque1, '-g');
 hold on;
 plot(t_plot, computed_torque1_gravity, '-r');
 hold off;
-title('Computed Torque);
+title('Computed Torque');
 legend('pd-outerloop', 'pd-gravity');
 
 
@@ -149,8 +140,8 @@ title('Computed Torque');
 legend('pd-outerloop', 'pd-gravity');
 
 
-figure(5)
-subplot(2,1,1)
+figure(5);
+subplot(2,1,1);
 plot(t_plot, error_plot(:,1), '-g');
 hold on;
 plot(t_plot, error_plot_gravity(:,1), '-b');
