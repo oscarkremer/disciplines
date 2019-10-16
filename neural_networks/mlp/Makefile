@@ -13,10 +13,17 @@ PYTHON_INTERPRETER = python3
 ################################################################################
 
 
-main:
+project1:
 	@echo "---> Starting Code to Train, Test and Validate"
-	@$(PYTHON_INTERPRETER) src/api/main.py
+	@$(PYTHON_INTERPRETER) src/api/project1.py
 
+project2:
+	@echo "---> Starting Code to Train, Test and Validate"
+	@$(PYTHON_INTERPRETER) src/api/project2.py
+
+project3:
+	@echo "---> Starting Code to Train, Test and Validate"
+	@$(PYTHON_INTERPRETER) src/api/project3.py
 
 setup: check_environment
 	@echo "---> Running setup.."

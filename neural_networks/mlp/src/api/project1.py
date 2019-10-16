@@ -55,7 +55,10 @@ class MLP:
             new_error = mean_squared_error(Y, pred)
             self.error.append(new_error)
             self.epochs+=1
+            print(new_error)
+        
             if abs(new_error - old_error) < self.sensibility:
+                print(new_error)
                 break
 
     def predict(self, data):
@@ -72,7 +75,25 @@ if __name__=='__main__':
     train = pd.read_csv('data/train/project_1.csv', decimal=',')
     trainX = np.array(train.drop(columns='d').values)
     trainY = np.array(train['d'].values)    
+    test = pd.read_csv('data/test/project_1.csv', decimal=',')
+    testX = np.array(test.drop(columns='d').values)
+    testY = np.array(test['d'].values)    
+
     model = MLP([3, 10, 1], 0.1, 0.8, sensibility=0.000001)
     model.fit(trainX, trainY)
-    for i in range(trainY.shape[0]):
-        print('{0} - {1}'.format(trainY[i], model.predict(trainX[i])))
+    pred = []
+    print('------ TESTE--------')
+    for i in range(testY.shape[0]):
+        pred.append(model.predict(testX[i]))
+    pred = np.array(pred).reshape((testY.shape[0]))
+    print('EPOCAS - {}'.format(model.epochs))    
+    error_test = (testY - pred)
+    print('ERROR MEDIO TESTE - {}'.format(np.mean(error_test)))
+    print('VARIANCIA TESTE - {}'.format(np.std(error_test)**2))
+    plt.plot(model.error)
+    plt.title('Mean Squared Error')
+    plt.grid(True)
+    plt.xlabel('Epochs')
+    plt.ylabel('MSE')
+    plt.savefig('plot.png')
+    
