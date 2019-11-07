@@ -5,18 +5,30 @@ from src.models import Estimator
 from random import *
 
 def f(t):
-    print(random())
-    print(t.shape[0])
     sig = []
     for i in range(t.shape[0]):
-        if random() > 0.5:
-            for j in range(100):
-                sig.append(1)
+        if i<t.shape[0]/3:
+            sig.append(1)
         else:
-            for j in range(100):
+            if i< 2*t.shape[0]/3:
                 sig.append(0)
-    print(sig[:t.shape[0]])
+            else:
+                sig.append(1)
     return np.array(sig[:t.shape[0]])
+
+
+def calculate_terms(array_model, delta_time):
+    print(array_model.shape)   
+    a = np.zeros(array_model.shape[1])
+    b = np.zeros(array_model.shape[1])
+    for i in range(array_model.shape[1]):
+        b[i] = (array_model[0][i]-1)/delta_time
+        a[i] = (array_model[1][i])/array_model[0][i]
+    return a,b
+#    b = (array_model[0]-1)/delta_time
+#    a = (array_model[1])
+#    return np.array(sig[:t.shape[0]])
+
 
 if __name__=='__main__':
     u, y ,models, thetas, p = [], [], [], [], []
@@ -24,17 +36,8 @@ if __name__=='__main__':
     final_time = 5.0
     t = np.arange(0, step + final_time, step)
     update_times = [5.1]
-    a = -0.997439
-    b1 = 0.00256081
-    
-#   a = 0.4
-  #   update_times = [0.03, 0.05, 0.07]
-    #update_times = [0.01, 0.05, 0.08, 0.1, 0.15, 0.2, 0.3]
-    #u = np.array([np.sin(t), np.cos(t), 3*np.power(t, 2)])
-    #print(u.shape)    
-#    weights = np.array([3*np.ones(t.shape[0]) + 40*np.sin(10*t), 2*np.ones(t.shape[0]) + 1.1*np.sin(2*t), 6*np.ones(t.shape[0])])
-#    y = np.sum(weights*u,axis=0)
-#    print(y.shape)
+    a = 1
+    b = 2
     sig = f(t)
 
     for i in range(t.shape[0]):
@@ -42,19 +45,9 @@ if __name__=='__main__':
             y.append(0)
             u.append([0, 0])
         else:
-            y.append(-a*y[i-1] + b1*sig[i-1])        
-            u.append([y[i-1], sig[i-1]])
+            y.append((1/(1+b*step))*y[i-1] + (a/(1+b*step))*sig[i])        
+            u.append([y[i-1], sig[i]])
     u = np.transpose(np.array(u))
-    print(u.shape)
-#    print(size(y))
-#    for i in range(t.shape[0]):
-#        if np.round(t[i],3) < 0.25:
-#            y.append([weights[0][0]*u[0][i] + weights[0][1]*u[1][i] + weights[0][2]*u[2][i]])
-#        else:
-#            if np.round(t[i],3) < 0.26:
-#                y.append([weights[1][0]*u[0][i] + weights[1][1]*u[1][i] + weights[1][2]*u[2][i]])
-#            else:
-#                y.append([weights[2][0]*u[0][i] + weights[2][1]*u[1][i] + weights[2][2]*u[2][i]])  
     analysis = 'error'
 #    analysis = 'mean'
     y = np.array(y)
@@ -90,13 +83,15 @@ if __name__=='__main__':
         plt.plot(t, model.y_hat)
     plt.show()
 
-    plt.plot(t,p)
-    plt.show()
-
     for model in models:
         plt.plot(t, np.transpose(np.array(model.theta_plot))[0])
         plt.plot(t, np.transpose(np.array(model.theta_plot))[1])
         plt.show()
 
-    plt.plot(t, error)
+    a, b = calculate_terms(np.transpose(np.array(model.theta_plot)), step)
+    plt.plot(a)
     plt.show()
+
+    plt.plot(b)
+    plt.show()
+    
