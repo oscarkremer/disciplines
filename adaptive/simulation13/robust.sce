@@ -4,7 +4,7 @@ delta_t=0.01
 t = (0:delta_t:100);
 t = t'
 ifinal=size(t);ifinal=ifinal(1);
-uc = sin(t);
+uc = 0.05*sin(16.1*t);
 s = poly(0, 's');
 g = syslin('c', 2/(s + 2))
 ym = csim(uc', t', g)';
@@ -54,4 +54,3 @@ plot(t, y_plot - ym)
 h = gca(); // get current axes
 
 h.data_bounds = [0, 100 ; 0, 0.6];
-
