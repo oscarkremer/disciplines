@@ -56,25 +56,6 @@ error_plot = zeros(sizes(1)-2,2);
 error_old_gravity = (q_des(:,1) - q0);
 error_plot_gravity = zeros(sizes(1)-2,2);
 
-for i=1:sizes(1)-2
-    error_new = (q_des(:,i) - q0_gravity);
-    M = [(m1+m2)/*L1^2+m2*L2^2+2*m2*L1*L2*cos(q0(2)) m2*L2^2+m2*L1*L2*cos(q0(2)); 
-         m2*L2^2 + m2*L1*L2*cos(q0(2)) m2*L2^2]; 
-    V = [-m2*L1*L2*(2*q_dot0(1)*q_dot0(2)+q_dot0(2)^2)*sin(q0(2));
-          m2*L1*L2*q_dot0(1)^2*sin(q0(2))];
-    G = [(m1+m2)*g*L1*cos(q0(1))+m2*g*L2*cos(q0(1)+q0(2)); m2*g*L2*cos(q0(1)+q0(2))];   
-    tau = k_v.*(q_dot_des(:,i)-q_dot0_gravity) + k_p.*(q_des(:,i) - q0_gravity) + G;
-    q_dot2 = inv(M)*(tau-V-G);
-    q_dot = q_dot0_gravity + delta_time*q_dot2;
-    q = q0_gravity + delta_time*q_dot0_gravity + 0.5*(q_dot2)*(delta_time)^2;
-    error_old_gravity = error_new;
-    error_plot_gravity(i,:) = error_new;
-    q0_gravity = q;
-    q_dot0_gravity = q_dot;
-    computed_torque1_gravity(i) = tau(1);
-    computed_torque2_gravity(i) = tau(2);
-    q_plot_gravity(i,:) = q;
-end
 
 
 for i=1:sizes(1)-2

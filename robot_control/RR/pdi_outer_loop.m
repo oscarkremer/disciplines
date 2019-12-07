@@ -132,7 +132,7 @@ plot(t_plot, error_plot(:,2));
 title('Error - Joint 2')
 
 %% Rotina para anima��o do rob�
-
+csvwrite ('trajectory.csv', q_plot)
 trajectory_x = [];
 trajectory_y = [];
 
